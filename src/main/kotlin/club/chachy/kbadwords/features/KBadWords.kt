@@ -22,34 +22,38 @@ class KBadWords {
 
     var deleteMessage = true
 
+    var ignoreBots = false
+
     fun processEvent(event: MessageReceivedEvent) {
+        if (ignoreBots && event.author.isBot) return
         event.message.contentRaw.split(" ").forEach {
             if (it.replace("[^a-zA-Z0-9]".toRegex(), "") in badWords) {
                 if (deleteMessage) {
                     event.message.delete().complete()
                 }
                 if (actionOnBadWord != null) {
-                    launchCoroutine("BadWord Action Coroutine") {
+                    launchCoroutine("Action") {
                         actionOnBadWord?.invoke(event.author, event.message, event.guild)
                     }
-                    return@forEach
                 }
+                return@forEach
             }
         }
     }
 
     fun processEvent(event: MessageUpdateEvent) {
+        if (ignoreBots && event.author.isBot) return
         event.message.contentRaw.split(" ").forEach {
             if (it.replace("[^a-zA-Z0-9]".toRegex(), "") in badWords) {
                 if (deleteMessage) {
                     event.message.delete().complete()
                 }
                 if (actionOnBadWord != null) {
-                    launchCoroutine("BadWord Action Coroutine") {
+                    launchCoroutine("Action") {
                         actionOnBadWord?.invoke(event.author, event.message, event.guild)
                     }
-                    return@forEach
                 }
+                return@forEach
             }
         }
     }
